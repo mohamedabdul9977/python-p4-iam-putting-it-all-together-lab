@@ -3,6 +3,7 @@ from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 from sqlalchemy import MetaData
 
 app = Flask(__name__)
@@ -22,3 +23,6 @@ db.init_app(app)
 bcrypt = Bcrypt(app)
 
 api = Api(app)
+
+# Configure CORS to allow requests from the frontend
+CORS(app, origins=['http://localhost:4000'], supports_credentials=True)

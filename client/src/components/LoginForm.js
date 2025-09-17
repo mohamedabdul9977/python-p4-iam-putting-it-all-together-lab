@@ -4,12 +4,13 @@ import { Button, Error, Input, FormField, Label } from "../styles";
 function LoginForm({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState([]);
+  const [errors, setErrors] = useState([]); // always start as empty array
   const [isLoading, setIsLoading] = useState(false);
 
   function handleSubmit(e) {
     e.preventDefault();
     setIsLoading(true);
+
     fetch("/login", {
       method: "POST",
       headers: {
@@ -21,7 +22,16 @@ function LoginForm({ onLogin }) {
       if (r.ok) {
         r.json().then((user) => onLogin(user));
       } else {
-        r.json().then((err) => setErrors(err.errors));
+        r.json().then((err) => {
+
+          if (err.errors) {
+            setErrors(err.errors); // backend sent an array
+          } else if (err.error) {
+            setErrors([err.error]); // backend sent a single string
+          } else {
+            setErrors(["Something went wrong."]);
+          }
+        });
       }
     });
   }
@@ -38,6 +48,7 @@ function LoginForm({ onLogin }) {
           onChange={(e) => setUsername(e.target.value)}
         />
       </FormField>
+
       <FormField>
         <Label htmlFor="password">Password</Label>
         <Input
@@ -48,11 +59,13 @@ function LoginForm({ onLogin }) {
           onChange={(e) => setPassword(e.target.value)}
         />
       </FormField>
+
       <FormField>
         <Button variant="fill" color="primary" type="submit">
           {isLoading ? "Loading..." : "Login"}
         </Button>
       </FormField>
+
       <FormField>
         {errors.map((err) => (
           <Error key={err}>{err}</Error>

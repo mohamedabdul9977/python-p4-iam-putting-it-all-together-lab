@@ -8,10 +8,17 @@ function RecipeList() {
   const [recipes, setRecipes] = useState([]);
 
   useEffect(() => {
-    fetch("/recipes")
-      .then((r) => r.json())
-      .then(setRecipes);
+    fetch("/recipes", {
+      credentials: "include", 
+    })
+      .then((r) => {
+        if (!r.ok) throw new Error("Failed to fetch recipes");
+        return r.json();
+      })
+      .then(setRecipes)
+      .catch((err) => console.error(err));
   }, []);
+
 
   return (
     <Wrapper>
